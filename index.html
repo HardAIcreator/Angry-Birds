@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ANGRY BIRDS: PIGGY ISLAND</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: #000; 
+            font-family: 'Arial', sans-serif; 
+            color: white;
+        }
+        
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a4a8a 0%, #2a6a9a 50%, #3a8aaa 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 70px;
+            font-weight: 900;
+            color: #ffaa00;
+            text-shadow: 4px 4px 0 #aa4400, 8px 8px 0 rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+            transform-origin: center;
+        }
+        
+        .logo span {
+            color: #ff5500;
+            font-size: 90px;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .subtitle {
+            font-size: 28px;
+            color: white;
+            text-shadow: 2px 2px 0 #aa4400;
+            margin-bottom: 60px;
+        }
+        
+        #startBtn {
+            padding: 20px 70px;
+            background: linear-gradient(135deg, #ffaa00, #ff5500);
+            border: 4px solid white;
+            border-radius: 60px;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 0 #aa4400;
+            transition: 0.1s;
+        }
+        
+        #startBtn:active {
+            transform: translateY(10px);
+            box-shadow: 0 0 0 #aa4400;
+        }
+        
+        #game {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 1;
+        }
+        
+        #ui { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            color: white; 
+            z-index: 10; 
+            background: rgba(0,0,0,0.8); 
+            padding: 12px; 
+            border-radius: 15px; 
+            border: 2px solid #ffaa00; 
+            font-size: 20px;
+            backdrop-filter: blur(5px);
+            display: flex;
+            gap: 20px;
+        }
+        
+        #score {
+            color: #ffaa00;
+            font-weight: bold;
+        }
+        
+        #birds-left {
+            color: #ff5500;
+            font-weight: bold;
+        }
+        
+        #level {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        #pause-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 12px 20px;
+            border-radius: 15px;
+            border: 2px solid #ffaa00;
+            color: white;
+            font-size: 24px;
+            z-index: 20;
+            cursor: pointer;
+        }
+        
+        #pause-btn:active {
+            transform: scale(0.95);
+        }
+        
+        #reset-btn {
+            position: absolute;
+            top: 10px;
+            right: 100px;
+            background: rgba(0,0,0,0.8);
+            padding: 12px 20px;
+            border-radius: 15px;
+            border: 2px solid #ff5500;
+            color: white;
+            font-size: 24px;
+            z-index: 20;
+            cursor: pointer;
+        }
+        
+        #reset-btn:active {
+            transform: scale(0.95);
+        }
+        
+        #controls { 
+            position: absolute; 
+            bottom: 30px; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px;
+            z-index: 20; 
+            pointer-events: none;
+        }
+
+        #controls > * {
+            pointer-events: auto;
+        }
+        
+        .control-btn { 
+            width: 90px; 
+            height: 90px; 
+            background: radial-gradient(circle at 30% 30%, #ffaa00, #aa4400); 
+            border: 4px solid white; 
+            border-radius: 50%; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 36px; 
+            box-shadow: 0 8px 0 #552200; 
+            transition: 0.1s;
+            cursor: pointer;
+        }
+
+        .control-btn:active { 
+            transform: translateY(8px); 
+            box-shadow: 0 0 0 #552200; 
+        }
+        
+        #shoot-btn {
+            background: radial-gradient(circle at 30% 30%, #ff0000, #aa0000);
+            box-shadow: 0 8px 0 #550000;
+        }
+        
+        #aim-line {
+            position: absolute;
+            bottom: 200px;
+            left: 50%;
+            width: 4px;
+            height: 100px;
+            background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
+            transform-origin: bottom center;
+            pointer-events: none;
+            z-index: 25;
+            display: none;
+        }
+        
+        #power-bar-container {
+            position: absolute;
+            bottom: 150px;
+            left: 20px;
+            width: 30px;
+            height: 150px;
+            background: rgba(0,0,0,0.5);
+            border: 3px solid white;
+            border-radius: 15px;
+            z-index: 25;
+            overflow: hidden;
+        }
+        
+        #power-bar-fill {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(180deg, #ff0000, #ffff00, #00ff00);
+            position: absolute;
+            bottom: 0;
+            transition: height 0.05s;
+        }
+        
+        #win-screen, #lose-screen { 
+            position: absolute; 
+            top:0; 
+            left:0; 
+            width:100%; 
+            height:100%; 
+            display: none; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            z-index:200; 
+            backdrop-filter: blur(10px);
+            font-size: 60px;
+        }
+        
+        #win-screen {
+            background: rgba(0,100,0,0.95); 
+            color: #ffaa00; 
+            text-shadow: 0 0 30px #ffaa00;
+        }
+        
+        #lose-screen {
+            background: rgba(100,0,0,0.95); 
+            color: white; 
+            text-shadow: 0 0 30px red;
+        }
+        
+        #next-level-btn, #restart-level-btn {
+            padding: 20px 60px;
+            border: 4px solid white;
+            border-radius: 60px;
+            font-size: 32px;
+            margin-top: 40px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        #next-level-btn {
+            background: linear-gradient(135deg, #ffaa00, #ff5500);
+            color: black;
+        }
+        
+        #restart-level-btn {
+            background: linear-gradient(135deg, #00aaff, #0055aa);
+            color: white;
+        }
+        
+        #next-level-btn:active, #restart-level-btn:active { transform: scale(0.9); }
+        
+        #pause-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background: rgba(0,0,0,0.95);
+            border: 3px solid #ffaa00;
+            border-radius: 30px;
+            padding: 20px;
+            z-index: 300;
+            backdrop-filter: blur(10px);
+            display: none;
+            color: white;
+            text-align: center;
+        }
+        
+        .pause-title {
+            color: #ffaa00;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .pause-option {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #ffaa00;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .pause-option:active {
+            transform: scale(0.95);
+        }
+        
+        #camera-touch-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+        
+        .drag-active {
+            background: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="splash">
+        <div class="logo">
+            <span>ANGRY</span> BIRDS
+        </div>
+        <div class="subtitle">PIGGY ISLAND</div>
+        <button id="startBtn">▶ PLAY</button>
+    </div>
+
+    <div id="game">
+        <div id="camera-touch-area"></div>
+        
+        <div id="ui">
+            <div>🎯 <span id="score">0</span></div>
+            <div>🐦 <span id="birds-left">3</span></div>
+            <div>📊 <span id="level">1</span></div>
+        </div>
+        
+        <div id="pause-btn" onclick="togglePause()">⏸️ ПАУЗА</div>
+        <div id="reset-btn" onclick="resetLevel()">🔄 СБРОС</div>
+        
+        <div id="aim-line"></div>
+        
+        <div id="power-bar-container">
+            <div id="power-bar-fill"></div>
+        </div>
+        
+        <div id="win-screen">
+            <div>🏆 ПОБЕДА! 🏆</div>
+            <div id="next-level-btn" onclick="nextLevel()">⏩ ДАЛЕЕ</div>
+        </div>
+        
+        <div id="lose-screen">
+            <div>💔 ПОРАЖЕНИЕ 💔</div>
+            <div id="restart-level-btn" onclick="restartLevel()">🔄 ЗАНОВО</div>
+        </div>
+        
+        <div id="pause-menu">
+            <div class="pause-title">⏸️ ПАУЗА</div>
+            <div class="pause-option" onclick="resumeGame()">▶ ПРОДОЛЖИТЬ</div>
+            <div class="pause-option" onclick="restartLevel()">🔄 ЗАНОВО</div>
+            <div class="pause-option" onclick="goToMenu()">🏠 МЕНЮ</div>
+        </div>
+
+        <div id="controls">
+            <div class="control-btn" id="shoot-btn" onclick="shootBird()">🔥</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+        let scene, camera, renderer;
+        let slingshot, bird, pigs = [], blocks = [], ground;
+        let birdsCount = 3;
+        let score = 0;
+        let currentLevel = 1;
+        let gameState = 'aiming'; // aiming, shooting, flying, ended
+        let isPaused = false;
+        
+        // Физика
+        let birdVelocity = { x: 0, y: 0, z: 0 };
+        let gravity = 0.01;
+        let isBirdFlying = false;
+        let birdStartPos = { x: -8, y: 2, z: 0 };
+        
+        // Прицеливание
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let dragOffset = { x: 0, y: 0 };
+        let maxDragDistance = 3;
+        let power = 0;
+        
+        // Камера
+        let cameraOffset = { x: 0, y: 5, z: 15 };
+        let targetCameraPos = { x: 0, y: 5, z: 15 };
+        
+        // Уровни
+        const levels = [
+            { // Уровень 1
+                pigs: [{ x: 5, y: 0.5, z: 2 }, { x: 7, y: 0.5, z: -1 }],
+                blocks: [
+                    { type: 'wood', x: 5, y: 1.5, z: 0, w: 2, h: 0.5, d: 1 },
+                    { type: 'wood', x: 7, y: 1.5, z: 1, w: 1, h: 0.5, d: 2 }
+                ]
+            },
+            { // Уровень 2
+                pigs: [{ x: 6, y: 2, z: 0 }, { x: 8, y: 0.5, z: 1.5 }, { x: 4, y: 0.5, z: -1.5 }],
+                blocks: [
+                    { type: 'wood', x: 6, y: 1, z: 0, w: 4, h: 0.5, d: 1 },
+                    { type: 'stone', x: 6, y: 2, z: 0, w: 2, h: 0.5, d: 1 },
+                    { type: 'wood', x: 6, y: 3, z: 0, w: 4, h: 0.5, d: 1 }
+                ]
+            },
+            { // Уровень 3
+                pigs: [{ x: 5, y: 3, z: 0 }, { x: 7, y: 0.5, z: 1 }, { x: 7, y: 0.5, z: -1 }],
+                blocks: [
+                    { type: 'wood', x: 5, y: 1, z: 0, w: 1, h: 2, d: 1 },
+                    { type: 'wood', x: 5, y: 1, z: 1, w: 1, h: 2, d: 1 },
+                    { type: 'wood', x: 5, y: 1, z: -1, w: 1, h: 2, d: 1 },
+                    { type: 'stone', x: 7, y: 1, z: 0, w: 2, h: 1, d: 2 }
+                ]
+            }
+        ];
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        function initGame() {
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('game').appendChild(renderer.domElement);
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.FogExp2(0x87CEEB, 0.01);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(-5, 5, 15);
+            camera.lookAt(0, 2, 0);
+
+            // Освещение
+            const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            sunLight.position.set(10, 20, 10);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 1024;
+            sunLight.shadow.mapSize.height = 1024;
+            const d = 20;
+            sunLight.shadow.camera.left = -d;
+            sunLight.shadow.camera.right = d;
+            sunLight.shadow.camera.top = d;
+            sunLight.shadow.camera.bottom = -d;
+            sunLight.shadow.camera.near = 1;
+            sunLight.shadow.camera.far = 50;
+            scene.add(sunLight);
+            
+            const ambientLight = new THREE.AmbientLight(0x404060);
+            scene.add(ambientLight);
+
+            // Земля
+            const groundGeo = new THREE.PlaneGeometry(30, 30);
+            const groundMat = new THREE.MeshLambertMaterial({ color: 0x6a994e });
+            ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = 0;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Трава (декоративные пучки)
+            for (let i = 0; i < 50; i++) {
+                const grassGeo = new THREE.ConeGeometry(0.1, 0.2, 6);
+                const grassMat = new THREE.MeshLambertMaterial({ color: 0x3a7734 });
+                const grass = new THREE.Mesh(grassGeo, grassMat);
+                grass.position.set((Math.random() - 0.5) * 20, 0.1, (Math.random() - 0.5) * 20);
+                grass.castShadow = true;
+                grass.receiveShadow = true;
+                scene.add(grass);
+            }
+
+            // Рогатка
+            createSlingshot();
+
+            // Загружаем уровень
+            loadLevel(currentLevel);
+
+            // Обработчики событий
+            const touchArea = document.getElementById('camera-touch-area');
+            
+            touchArea.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (gameState !== 'aiming' || isPaused) return;
+                
+                const touch = e.touches[0];
+                const rect = renderer.domElement.getBoundingClientRect();
+                const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+                const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+                
+                // Проверяем, попали ли по птице
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+                const intersects = raycaster.intersectObject(bird);
+                
+                if (intersects.length > 0) {
+                    isDragging = true;
+                    touchArea.classList.add('drag-active');
+                    dragStart = { x: touch.clientX, y: touch.clientY };
+                    dragOffset = { x: 0, y: 0 };
+                }
+            });
+            
+            touchArea.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!isDragging || gameState !== 'aiming' || isPaused) return;
+                
+                const touch = e.touches[0];
+                const deltaX = (touch.clientX - dragStart.x) / 100;
+                const deltaY = (touch.clientY - dragStart.y) / 100;
+                
+                dragOffset.x = Math.max(-maxDragDistance, Math.min(maxDragDistance, -deltaX));
+                dragOffset.y = Math.max(-maxDragDistance, Math.min(maxDragDistance, deltaY));
+                
+                // Обновляем позицию птицы (натягиваем рогатку)
+                bird.position.x = birdStartPos.x + dragOffset.x;
+                bird.position.y = birdStartPos.y + dragOffset.y;
+                
+                // Обновляем силу выстрела
+                power = Math.sqrt(dragOffset.x * dragOffset.x + dragOffset.y * dragOffset.y) / maxDragDistance;
+                document.getElementById('power-bar-fill').style.height = (power * 100) + '%';
+                
+                // Показываем линию прицела
+                const aimLine = document.getElementById('aim-line');
+                aimLine.style.display = 'block';
+                const angle = Math.atan2(dragOffset.y, -dragOffset.x);
+                aimLine.style.transform = `translateX(-50%) rotate(${angle}rad)`;
+                aimLine.style.height = (100 + power * 200) + 'px';
+            });
+            
+            touchArea.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                if (isDragging && gameState === 'aiming' && !isPaused) {
+                    shootBird();
+                }
+                isDragging = false;
+                touchArea.classList.remove('drag-active');
+                document.getElementById('aim-line').style.display = 'none';
+            });
+
+            window.addEventListener('resize', onWindowResize, false);
+            
+            animate();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // ========== СОЗДАНИЕ ОБЪЕКТОВ ==========
+        function createSlingshot() {
+            const group = new THREE.Group();
+            
+            // Основание
+            const base = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 0.5, 1.5),
+                new THREE.MeshLambertMaterial({ color: 0x8b4513 })
+            );
+            base.position.set(-8, 0.25, 0);
+            base.castShadow = true;
+            base.receiveShadow = true;
+            scene.add(base);
+            
+            // Столбы
+            const postMat = new THREE.MeshLambertMaterial({ color: 0xa0522d });
+            
+            const leftPost = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.3, 0.3, 3),
+                postMat
+            );
+            leftPost.position.set(-8.8, 1.5, 0.5);
+            leftPost.castShadow = true;
+            leftPost.receiveShadow = true;
+            scene.add(leftPost);
+            
+            const rightPost = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.3, 0.3, 3),
+                postMat
+            );
+            rightPost.position.set(-7.2, 1.5, 0.5);
+            rightPost.castShadow = true;
+            rightPost.receiveShadow = true;
+            scene.add(rightPost);
+            
+            // Резинка (тор)
+            const rubberMat = new THREE.MeshLambertMaterial({ color: 0xcc5500 });
+            const rubber = new THREE.Mesh(
+                new THREE.TorusGeometry(0.8, 0.1, 8, 20, Math.PI),
+                rubberMat
+            );
+            rubber.rotation.y = Math.PI / 2;
+            rubber.rotation.z = -0.3;
+            rubber.position.set(-8, 2, 0.8);
+            rubber.castShadow = true;
+            scene.add(rubber);
+            
+            // Карман для птицы
+            const pocket = new THREE.Mesh(
+                new THREE.SphereGeometry(0.3),
+                new THREE.MeshLambertMaterial({ color: 0xcc5500 })
+            );
+            pocket.position.set(-8, 2, 1.2);
+            pocket.castShadow = true;
+            scene.add(pocket);
+            
+            slingshot = { base, leftPost, rightPost, rubber, pocket };
+        }
+
+        function createBird() {
+            const group = new THREE.Group();
+            
+            // Тело
+            const body = new THREE.Mesh(
+                new THREE.SphereGeometry(0.6),
+                new THREE.MeshLambertMaterial({ color: 0xff3333 })
+            );
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // Глаза
+            const eyeMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const pupilMat = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            
+            const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.15), eyeMat);
+            leftEye.position.set(-0.25, 0.2, 0.5);
+            group.add(leftEye);
+            
+            const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.15), eyeMat);
+            rightEye.position.set(0.25, 0.2, 0.5);
+            group.add(rightEye);
+            
+            const leftPupil = new THREE.Mesh(new THREE.SphereGeometry(0.08), pupilMat);
+            leftPupil.position.set(-0.25, 0.2, 0.65);
+            group.add(leftPupil);
+            
+            const rightPupil = new THREE.Mesh(new THREE.SphereGeometry(0.08), pupilMat);
+            rightPupil.position.set(0.25, 0.2, 0.65);
+            group.add(rightPupil);
+            
+            // Клюв
+            const beak = new THREE.Mesh(
+                new THREE.ConeGeometry(0.2, 0.4, 8),
+                new THREE.MeshLambertMaterial({ color: 0xffaa00 })
+            );
+            beak.position.set(0, 0, 0.8);
+            beak.rotation.x = 0.2;
+            beak.castShadow = true;
+            group.add(beak);
+            
+            // Бровь (сердитая)
+            const browMat = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            const brow = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3, 0.05, 0.1),
+                browMat
+            );
+            brow.position.set(0, 0.4, 0.5);
+            brow.rotation.z = -0.1;
+            brow.castShadow = true;
+            group.add(brow);
+            
+            group.position.set(birdStartPos.x, birdStartPos.y, birdStartPos.z);
+            
+            return group;
+        }
+
+        function createPig(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Тело
+            const body = new THREE.Mesh(
+                new THREE.SphereGeometry(0.5),
+                new THREE.MeshLambertMaterial({ color: 0x88aa55 })
+            );
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // Пятак
+            const nose = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.2, 0.2, 0.1, 8),
+                new THREE.MeshLambertMaterial({ color: 0xcc8899 })
+            );
+            nose.position.set(0, 0, 0.5);
+            nose.rotation.x = Math.PI / 2;
+            nose.castShadow = true;
+            group.add(nose);
+            
+            // Глаза
+            const eyeMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const pupilMat = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            
+            const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.1), eyeMat);
+            leftEye.position.set(-0.2, 0.2, 0.3);
+            group.add(leftEye);
+            
+            const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.1), eyeMat);
+            rightEye.position.set(0.2, 0.2, 0.3);
+            group.add(rightEye);
+            
+            const leftPupil = new THREE.Mesh(new THREE.SphereGeometry(0.05), pupilMat);
+            leftPupil.position.set(-0.2, 0.2, 0.4);
+            group.add(leftPupil);
+            
+            const rightPupil = new THREE.Mesh(new THREE.SphereGeometry(0.05), pupilMat);
+            rightPupil.position.set(0.2, 0.2, 0.4);
+            group.add(rightPupil);
+            
+            // Уши
+            const earMat = new THREE.MeshLambertMaterial({ color: 0x88aa55 });
+            
+            const leftEar = new THREE.Mesh(
+                new THREE.ConeGeometry(0.15, 0.3, 6),
+                earMat
+            );
+            leftEar.position.set(-0.3, 0.4, 0.1);
+            leftEar.rotation.z = -0.3;
+            leftEar.castShadow = true;
+            group.add(leftEar);
+            
+            const rightEar = new THREE.Mesh(
+                new THREE.ConeGeometry(0.15, 0.3, 6),
+                earMat
+            );
+            rightEar.position.set(0.3, 0.4, 0.1);
+            rightEar.rotation.z = 0.3;
+            rightEar.castShadow = true;
+            group.add(rightEar);
+            
+            group.position.set(x, y + 0.5, z);
+            group.userData = { health: 100, type: 'pig' };
+            
+            return group;
+        }
+
+        function createBlock(type, x, y, z, w, h, d) {
+            const colors = {
+                wood: 0xccaa66,
+                stone: 0x888888,
+                glass: 0xaaccff
+            };
+            
+            const block = new THREE.Mesh(
+                new THREE.BoxGeometry(w, h, d),
+                new THREE.MeshLambertMaterial({ color: colors[type] || 0xccaa66 })
+            );
+            block.position.set(x, y + h/2, z);
+            block.castShadow = true;
+            block.receiveShadow = true;
+            
+            block.userData = {
+                type: type,
+                health: type === 'wood' ? 50 : (type === 'stone' ? 100 : 30),
+                initialY: y + h/2
+            };
+            
+            return block;
+        }
+
+        // ========== ЗАГРУЗКА УРОВНЯ ==========
+        function loadLevel(level) {
+            // Очистка предыдущих объектов
+            pigs.forEach(pig => scene.remove(pig));
+            blocks.forEach(block => scene.remove(block));
+            if (bird) scene.remove(bird);
+            
+            pigs = [];
+            blocks = [];
+            
+            // Создаем новую птицу
+            bird = createBird();
+            scene.add(bird);
+            
+            // Загружаем свиней
+            const levelData = levels[level - 1];
+            levelData.pigs.forEach(p => {
+                const pig = createPig(p.x, p.y, p.z);
+                scene.add(pig);
+                pigs.push(pig);
+            });
+            
+            // Загружаем блоки
+            levelData.blocks.forEach(b => {
+                const block = createBlock(b.type, b.x, b.y, b.z, b.w, b.h, b.d);
+                scene.add(block);
+                blocks.push(block);
+            });
+            
+            // Сброс состояния
+            birdsCount = 3;
+            score = 0;
+            gameState = 'aiming';
+            isBirdFlying = false;
+            bird.position.set(birdStartPos.x, birdStartPos.y, birdStartPos.z);
+            
+            updateUI();
+        }
+
+        // ========== ВЫСТРЕЛ ==========
+        window.shootBird = function() {
+            if (gameState !== 'aiming' || isBirdFlying || birdsCount <= 0 || isPaused) return;
+            
+            gameState = 'shooting';
+            isBirdFlying = true;
+            
+            // Рассчитываем скорость
+            const speed = power * 0.5;
+            birdVelocity.x = -dragOffset.x * speed;
+            birdVelocity.y = dragOffset.y * speed;
+            birdVelocity.z = 0;
+            
+            // Сбрасываем натяжение
+            dragOffset = { x: 0, y: 0 };
+            power = 0;
+            document.getElementById('power-bar-fill').style.height = '0%';
+            
+            birdsCount--;
+            updateUI();
+            
+            // Запускаем физику
+            startBirdFlight();
+        };
+
+        function startBirdFlight() {
+            const interval = setInterval(() => {
+                if (isPaused) return;
+                
+                // Движение
+                bird.position.x += birdVelocity.x;
+                bird.position.y += birdVelocity.y;
+                bird.position.z += birdVelocity.z;
+                
+                // Гравитация
+                birdVelocity.y -= gravity;
+                
+                // Вращение
+                bird.rotation.x += birdVelocity.y * 0.1;
+                bird.rotation.z += birdVelocity.x * 0.1;
+                
+                // Проверка коллизий со свиньями
+                pigs.forEach((pig, index) => {
+                    if (pig && bird.position.distanceTo(pig.position) < 1.2) {
+                        // Уничтожаем свинью
+                        scene.remove(pig);
+                        pigs.splice(index, 1);
+                        score += 100;
+                        updateUI();
+                        
+                        // Взрывной эффект
+                        createExplosion(pig.position);
+                        
+                        // Отскакивание птицы
+                        birdVelocity.x *= -0.5;
+                        birdVelocity.y *= 0.8;
+                        
+                        playSound('hit');
+                    }
+                });
+                
+                // Проверка коллизий с блоками
+                blocks.forEach((block, index) => {
+                    if (block && bird.position.distanceTo(block.position) < 1.5) {
+                        block.userData.health -= 30;
+                        
+                        if (block.userData.health <= 0) {
+                            scene.remove(block);
+                            blocks.splice(index, 1);
+                            score += 50;
+                            updateUI();
+                            createExplosion(block.position);
+                        } else {
+                            // Трясем блок
+                            block.position.y += 0.1;
+                            setTimeout(() => {
+                                if (block) block.position.y = block.userData.initialY;
+                            }, 100);
+                        }
+                        
+                        // Отскакивание
+                        birdVelocity.x *= -0.3;
+                        birdVelocity.y *= 0.6;
+                        
+                        playSound('hit');
+                    }
+                });
+                
+                // Проверка земли
+                if (bird.position.y < 0.5) {
+                    bird.position.y = 0.5;
+                    birdVelocity.y = -birdVelocity.y * 0.3;
+                    
+                    if (Math.abs(birdVelocity.y) < 0.01 && Math.abs(birdVelocity.x) < 0.01) {
+                        // Птица остановилась
+                        clearInterval(interval);
+                        endBirdFlight();
+                    }
+                }
+                
+                // Проверка вылета за пределы
+                if (bird.position.x > 15 || bird.position.x < -15 || 
+                    bird.position.z > 10 || bird.position.z < -10) {
+                    clearInterval(interval);
+                    endBirdFlight();
+                }
+                
+            }, 16); // ~60 FPS
+        }
+
+        function endBirdFlight() {
+            isBirdFlying = false;
+            
+            // Проверяем, остались ли свиньи
+            if (pigs.length === 0) {
+                gameState = 'ended';
+                document.getElementById('win-screen').style.display = 'flex';
+            } else if (birdsCount === 0) {
+                gameState = 'ended';
+                document.getElementById('lose-screen').style.display = 'flex';
+            } else {
+                gameState = 'aiming';
+                // Возвращаем птицу на рогатку
+                bird.position.set(birdStartPos.x, birdStartPos.y, birdStartPos.z);
+                bird.rotation.set(0, 0, 0);
+            }
+        }
+
+        function createExplosion(position) {
+            const particles = [];
+            for (let i = 0; i < 10; i++) {
+                const particle = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.1),
+                    new THREE.MeshBasicMaterial({ color: 0xffaa00 })
+                );
+                particle.position.copy(position);
+                scene.add(particle);
+                particles.push(particle);
+                
+                const vx = (Math.random() - 0.5) * 0.5;
+                const vy = Math.random() * 0.5;
+                const vz = (Math.random() - 0.5) * 0.5;
+                
+                let life = 0;
+                const interval = setInterval(() => {
+                    particle.position.x += vx;
+                    particle.position.y += vy;
+                    particle.position.z += vz;
+                    life++;
+                    
+                    if (life > 20) {
+                        scene.remove(particle);
+                        clearInterval(interval);
+                    }
+                }, 30);
+            }
+        }
+
+        function playSound(type) {
+            // Заглушка для звуков (в реальности тут был бы Audio)
+        }
+
+        // ========== УПРАВЛЕНИЕ ИГРОЙ ==========
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('birds-left').innerText = birdsCount;
+            document.getElementById('level').innerText = currentLevel;
+        }
+
+        window.resetLevel = function() {
+            document.getElementById('win-screen').style.display = 'none';
+            document.getElementById('lose-screen').style.display = 'none';
+            document.getElementById('pause-menu').style.display = 'none';
+            isPaused = false;
+            loadLevel(currentLevel);
+        };
+
+        window.nextLevel = function() {
+            document.getElementById('win-screen').style.display = 'none';
+            currentLevel++;
+            if (currentLevel > levels.length) {
+                currentLevel = 1; // Зацикливаем
+            }
+            resetLevel();
+        };
+
+        window.togglePause = function() {
+            isPaused = !isPaused;
+            document.getElementById('pause-menu').style.display = isPaused ? 'block' : 'none';
+        };
+
+        window.resumeGame = function() {
+            isPaused = false;
+            document.getElementById('pause-menu').style.display = 'none';
+        };
+
+        window.goToMenu = function() {
+            location.reload(); // Простой выход в меню
+        };
+
+        // ========== АНИМАЦИЯ ==========
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (!camera || !renderer || !scene) return;
+            
+            // Плавное движение камеры
+            if (gameState === 'aiming' && !isPaused) {
+                targetCameraPos.x = -5 + (dragOffset.x * 0.5);
+                targetCameraPos.y = 5 + (dragOffset.y * 0.3);
+            } else {
+                targetCameraPos.x = -5;
+                targetCameraPos.y = 5;
+            }
+            
+            camera.position.x += (targetCameraPos.x - camera.position.x) * 0.1;
+            camera.position.y += (targetCameraPos.y - camera.position.y) * 0.1;
+            camera.lookAt(0, 2, 0);
+            
+            // Анимация свиней (дыхание)
+            pigs.forEach((pig, i) => {
+                pig.position.y += Math.sin(Date.now() * 0.005 + i) * 0.002;
+            });
+            
+            renderer.render(scene, camera);
+        }
+
+        // ========== ЗАПУСК ==========
+        window.startGame = function() {
+            document.getElementById('splash').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            initGame();
+        };
+
+        document.getElementById('startBtn').addEventListener('click', startGame);
+    </script>
+</body>
+  </html>
